@@ -1,0 +1,19 @@
+[package]
+name = "banch_iri"
+version = "0.1.0"
+authors = ["Pierre-Antoine Champin <pierre-antoine@w3.org>"]
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+iref = "3.1.4"
+oxiri = "0.2.3"
+sophia_iri = "0.8.0"
+
+[dev-dependencies]
+criterion = "0.5.1"
+
+[[bench]]
+name = "my_benchmark"
+harness = false
