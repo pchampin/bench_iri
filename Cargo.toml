@@ -8,6 +8,7 @@ edition = "2021"
 
 [dependencies]
 iref = "3.1.4"
+iri-string = { version = "0.7.2", features = ["alloc"] }
 oxiri = "0.2.3"
 sophia_iri = "0.8.0"
 

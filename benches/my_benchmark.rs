@@ -1,6 +1,7 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use oxiri::{Iri as Oxiri, IriRef as OxiriRef};
 use sophia_iri::*;
+use iri_string::format::ToDedicatedString;
 
 fn abs_examples() -> &'static [&'static str] {
     &[
@@ -66,6 +67,26 @@ fn bench_sophia_iri_parse_relative(c: &mut Criterion) {
         b.iter(|| {
             for iri in abs_examples().iter() {
                 black_box(IriRef::new(*iri).unwrap());
+            }
+        })
+    });
+}
+
+fn bench_iristring_parse(c: &mut Criterion) {
+    c.bench_function("parse abs iri-string", |b| {
+        b.iter(|| {
+            for iri in abs_examples().iter() {
+                black_box(iri_string::types::IriStr::new(*iri).unwrap());
+            }
+        })
+    });
+}
+
+fn bench_iristring_parse_relative(c: &mut Criterion) {
+    c.bench_function("parse rel iri-string", |b| {
+        b.iter(|| {
+            for iri in abs_examples().iter() {
+                black_box(iri_string::types::IriReferenceStr::new(*iri).unwrap());
             }
         })
     });
@@ -184,6 +205,37 @@ fn bench_iref_resolve(c: &mut Criterion) {
     });
 }
 
-criterion_group!(iri, bench_oxiri_parse, bench_oxiri_parse_relative, bench_sophia_iri_parse, bench_sophia_iri_parse_relative, bench_iref_parse, bench_iref_parse_relative, bench_oxiri_resolve, bench_sophia_resolve, bench_iref_resolve);
+// This bench is much slower than the ones for oxiri and sophia,
+// because it allocates a new String on each test, while oxiri and sophia reuse the same buffer all along.
+//
+// This may be consider an unfair comparison, but then iref does not provide any way to reuse a buffer...
+fn bench_iristring_resolve(c: &mut Criterion) {
+    let base = iri_string::types::IriAbsoluteStr::new("http://a/b/c/d;p?q").unwrap();
+    let resolver = iri_string::resolve::FixedBaseResolver::new(base);
+
+    c.bench_function("resolve iri-string", |b| {
+        b.iter(|| {
+            for relative in rel_examples().iter() {
+                black_box(resolver.resolve(iri_string::types::IriReferenceStr::new(*relative).unwrap()).to_dedicated_string());
+            }
+        })
+    });
+}
+
+criterion_group!(iri,
+    bench_iref_parse,
+    bench_iref_parse_relative,
+    bench_iristring_parse,
+    bench_iristring_parse_relative,
+    bench_oxiri_parse,
+    bench_oxiri_parse_relative,
+    bench_sophia_iri_parse,
+    bench_sophia_iri_parse_relative,
+
+    bench_iristring_resolve,
+    bench_iref_resolve,
+    bench_oxiri_resolve,
+    bench_sophia_resolve,
+);
 
 criterion_main!(iri);
