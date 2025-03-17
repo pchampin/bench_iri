@@ -33,11 +33,9 @@ For **parsing arbitrary IRI references** (which can therefore be absolute or rel
 we see a big difference when the input is an absolute IRI reference or a relative one.
 In the former case, the performances are very similar to the case where an (absolute) IRI is expected (described above).
 However, in the latter case, [sophia_iri] drops from being the fastest to being the slowest.
-I have not fully investigated this,
-but one reason might be that [`sophia_iri`] first tries to match a regular expression for absolute IRI references,
+The reason seems to be that [sophia_iri] first tries to match a regular expression for absolute IRI references,
 and if it fails, tries to match another regular expression for relative IRI references.
-It might be intersting to try this in the reverse order (hoping that the regular expression for relative references fails faster),
-or combining them into a single regular expression.
+*Another experiment (not in the report) shows that using a `RegexSet` instead brings back [sophia_iri] on par with the other crates.*
 
 For **resolving relative IRI references** against a fixed base, there are two dimensions along which the different crates differ:
 * [iri-string], [oxiri] and [sophia_iri] provide a dedicated type for the base IRI, which pre-parses the base IRI once and for all
@@ -58,8 +56,7 @@ For **resolving relative IRI references** against a fixed base, there are two di
 In RDF, the IRIs present in a graph are unlikely to serve as bases to resolve relative IRI references,
 so "common-use" should only wrap the underlying text with the guarantee that it is a valid IRI (or IRI reference).
 
-For such "lightweight" IRIs, the [regex](https://crates.io/regex) crates seems to provide very good performances for parsing
-(with the caveat of relative IRIs in [sophia_iri], to investigate).
+For such "lightweight" IRIs, the [regex](https://crates.io/regex) crates seems to provide very good performances for parsing.
 
 For those IRIs that are destined to serve as base (typically, the IRI of a document from which triples or quads are parsed),
 a dedicated type that stores the internal structure of the IRI should be provided
