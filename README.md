@@ -16,7 +16,7 @@ This compares performances of
 
 ## Analysis
 
-The detailed results are available [here](https://pchampin.github.io/bench_iri/report/).
+The detailed results are available [here](https://pchampin.github.io/bench_iri/results/report/).
 
 For **parsing (absolute) IRIs**, [sophia_iri] is by far the fastest, and [oxiri] is the slowest.
 [oxiri] being slow is probably due to the fact that it does not only check that the underlying text complies with RFC 3987,
